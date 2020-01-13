@@ -1,7 +1,8 @@
+import re
 from selenium import webdriver
 from time import sleep
+from datetime import datetime
 import os
-import re
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
