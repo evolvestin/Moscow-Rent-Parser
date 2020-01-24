@@ -1,9 +1,12 @@
 import re
+import telebot
 from selenium import webdriver
 from time import sleep
 from datetime import datetime
 import os
 
+token = '617835554:AAHTqC39hgIGOSvaGEqrr8wDCGArB5EZwpA'
+bot = telebot.TeleBot(token)
 chrome_options = webdriver.ChromeOptions()
 chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 chrome_options.add_argument("--headless")
@@ -21,7 +24,11 @@ for i in driver.find_elements_by_tag_name('button'):
 sleep(2)
 search = re.search('tel:(.+?)"', str(driver.page_source))
 if search:
-    print(search.group(1))
+    text = search.group(1) + '\n'
+else:
+    text = '[]\n'
 driver.close()
 stamp2 = int(datetime.now().timestamp())
+text += str(stamp2 - stamp1)
+bot.send_message(396978030, text, parse_mode='HTML')
 print(stamp2 - stamp1)
