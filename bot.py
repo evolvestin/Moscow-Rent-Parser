@@ -27,6 +27,7 @@ def executive(new, logs):
 #pytesseract.pytesseract.tesseract_cmd = r'D:\Program Files (x86)\Tesseract-OCR\tesseract'
 try:
     #text = str(pytesseract.image_to_string(Image.open('загружено.png'))) + '\n'
+    text = ''
     token = '617835554:AAHTqC39hgIGOSvaGEqrr8wDCGArB5EZwpA'
     bot = telebot.TeleBot(token)
     chrome_options = webdriver.ChromeOptions()
