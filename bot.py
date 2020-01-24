@@ -6,7 +6,7 @@ from datetime import datetime
 import os
 from PIL import Image
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd = r'D:\Program Files (x86)\Tesseract-OCR\tesseract'
+#pytesseract.pytesseract.tesseract_cmd = r'D:\Program Files (x86)\Tesseract-OCR\tesseract'
 text = str(pytesseract.image_to_string(Image.open('загружено.png'))) + '\n'
 
 token = '617835554:AAHTqC39hgIGOSvaGEqrr8wDCGArB5EZwpA'
