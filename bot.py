@@ -22,7 +22,7 @@ def executive(new, logs):
     error = 'Вылет ' + name + '\n'
     for i in error_raw:
         error += str(i)
-    bot.send_message(idMe, error)
+    bot.send_message(396978030, error)
 
 #pytesseract.pytesseract.tesseract_cmd = r'D:\Program Files (x86)\Tesseract-OCR\tesseract'
 try:
