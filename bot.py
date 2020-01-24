@@ -21,10 +21,11 @@ def executive(new, logs):
         error += str(i)
     bot.send_message(396978030, error)
 
-#pytesseract.pytesseract.tesseract_cmd = r'D:\Program Files (x86)\Tesseract-OCR\tesseract'
+
 try:
     from PIL import Image
     import pytesseract
+    pytesseract.pytesseract.tesseract_cmd = r'/app/.apt/usr/bin/tesseract'
     text = str(pytesseract.image_to_string(Image.open('загружено.png'))) + '\n'
     #text = ''
     token = '617835554:AAHTqC39hgIGOSvaGEqrr8wDCGArB5EZwpA'
