@@ -16,7 +16,7 @@ driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), c
 # huila
 
 stamp1 = int(datetime.now().timestamp())
-driver.get("https://www.domofond.ru/1-komnatnaya-kvartira-v-arendu-moskva-2085427441")
+driver.get("https://www.domofond.ru/2-komnatnaya-kvartira-na-prodazhu-moskva-1803330801")
 #driver.find_element_by_class_name('sc-cJSrbW iElBmz').click()
 for i in driver.find_elements_by_tag_name('button'):
     if 'showNumber' in i.get_attribute('class'):
