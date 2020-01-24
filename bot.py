@@ -7,8 +7,8 @@ from selenium import webdriver
 from time import sleep
 from datetime import datetime
 import os
-from PIL import Image
-import pytesseract
+#from PIL import Image
+#import pytesseract
 
 
 def executive(new, logs):
@@ -26,7 +26,7 @@ def executive(new, logs):
 
 #pytesseract.pytesseract.tesseract_cmd = r'D:\Program Files (x86)\Tesseract-OCR\tesseract'
 try:
-    text = str(pytesseract.image_to_string(Image.open('загружено.png'))) + '\n'
+    #text = str(pytesseract.image_to_string(Image.open('загружено.png'))) + '\n'
     token = '617835554:AAHTqC39hgIGOSvaGEqrr8wDCGArB5EZwpA'
     bot = telebot.TeleBot(token)
     chrome_options = webdriver.ChromeOptions()
