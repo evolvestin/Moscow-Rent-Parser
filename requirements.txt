@@ -20,3 +20,5 @@ beautifulsoup4==4.8.0
 heroku3==3.4.0
 selenium
 geocoder==1.38.1
+Pillow==7.0.0
+pytesseract==0.3.1
