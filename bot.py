@@ -10,7 +10,7 @@ chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-
+# huila
 
 stamp1 = int(datetime.now().timestamp())
 driver.get("https://www.domofond.ru/1-komnatnaya-kvartira-v-arendu-moskva-2085427441")
