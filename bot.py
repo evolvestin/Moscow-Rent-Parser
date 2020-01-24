@@ -4,6 +4,10 @@ from selenium import webdriver
 from time import sleep
 from datetime import datetime
 import os
+from PIL import Image
+import pytesseract
+pytesseract.pytesseract.tesseract_cmd = r'D:\Program Files (x86)\Tesseract-OCR\tesseract'
+text = str(pytesseract.image_to_string(Image.open('загружено.png'))) + '\n'
 
 token = '617835554:AAHTqC39hgIGOSvaGEqrr8wDCGArB5EZwpA'
 bot = telebot.TeleBot(token)
@@ -24,9 +28,9 @@ for i in driver.find_elements_by_tag_name('button'):
 sleep(2)
 search = re.search('tel:(.+?)"', str(driver.page_source))
 if search:
-    text = search.group(1) + '\n'
+    text += search.group(1) + '\n'
 else:
-    text = '[]\n'
+    text += '[]\n'
 driver.close()
 stamp2 = int(datetime.now().timestamp())
 text += str(stamp2 - stamp1)
