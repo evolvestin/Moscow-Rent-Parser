@@ -147,6 +147,7 @@ def executive(new, logs):
     error = 'Вылет ' + name + '\n'
     for i in error_raw:
         error += str(i)
+    print('ERRORRRRRRRRRRRRRRRRRRR\n' + error)
     if logs == 0:
         if len(error) > 4000:
             separator = 4000
@@ -1192,8 +1193,10 @@ def avito_checker():
         try:
             sleep(5)
             driver = docs.web()
+            print('https://www.avito.ru/moskva/kvartiry/sdam/na_dlitelnyy_srok?user=1')
             driver.get('https://www.avito.ru/moskva/kvartiry/sdam/na_dlitelnyy_srok?user=1')
             soup = BeautifulSoup(driver.page_source, 'html.parser')
+            print(soup)
             posts_raw = soup.find_all('div', class_='item__line')
             posts = []
             for i in posts_raw:
