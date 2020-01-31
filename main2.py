@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 '
-                         '(KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'}
 print(headers)
 text = requests.get('https://www.avito.ru/moskva/kvartiry/sdam/na_dlitelnyy_srok?user=1', headers=headers)
 print(text)
