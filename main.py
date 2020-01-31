@@ -121,8 +121,18 @@ def send_json(raw, name, error):
     if len(error) <= 1000:
         caption = error
     bot.send_document(idMe, doc, caption=caption, parse_mode='HTML')
-    if len(error) > 1000:
+    if len(error) > 1000 and len(error) <= 4000:
         bot.send_message(idMe, error, parse_mode='HTML')
+    if len(error) > 4000:
+        separator = 4000
+        splited_sep = len(error) // separator
+        splited_mod = len(error) / separator - len(error) // separator
+        if splited_mod != 0:
+            splited_sep += 1
+        for i in range(0, splited_sep):
+            splited_error = error[i * separator:(i + 1) * separator]
+            if len(splited_error) > 0:
+                bot.send_message(idMe, splited_error, parse_mode='HTML')
     doc.close()
 
 
@@ -1198,7 +1208,7 @@ def telepol():
 if __name__ == '__main__':
     gain = []
     if docs.floater == 1:
-        gain = [avito_checker, domofond_checker]
+        gain = [avito_checker]
     elif docs.idMain == idMe:
         gain = []  # irr_checker, cian_checker, kvartirant_checker, sob_checker, move_checker]
     thread_array = defaultdict(dict)
