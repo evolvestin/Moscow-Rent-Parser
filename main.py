@@ -103,7 +103,6 @@ def printer(printer_text):
 
 
 def send_json(raw, name, error):
-    caption = ''
     json_text = ''
     for character in raw:
         replaced = unidecode(str(character))
@@ -114,15 +113,18 @@ def send_json(raw, name, error):
                 json_text += '[' + unicodedata.name(character) + ']'
             except ValueError:
                 json_text += '[???]'
-    docw = open(name + '.json', 'w')
-    docw.write(json_text)
-    docw.close()
-    doc = open(name + '.json', 'rb')
     if len(error) <= 1000:
-        caption = error
-    bot.send_document(idMe, doc, caption=caption)
+        if json_text != '':
+            docw = open(name + '.json', 'w')
+            docw.write(json_text)
+            docw.close()
+            doc = open(name + '.json', 'rb')
+            bot.send_document(-1001320247347, doc, caption=error)
+            doc.close()
+        else:
+            bot.send_message(-1001320247347, error, parse_mode='HTML')
     if len(error) > 1000 and len(error) <= 4000:
-        bot.send_message(idMe, error, parse_mode='HTML')
+        bot.send_message(-1001320247347, error)
     if len(error) > 4000:
         separator = 4000
         splited_sep = len(error) // separator
@@ -132,8 +134,7 @@ def send_json(raw, name, error):
         for i in range(0, splited_sep):
             splited_error = error[i * separator:(i + 1) * separator]
             if len(splited_error) > 0:
-                bot.send_message(idMe, splited_error, parse_mode='HTML')
-    doc.close()
+                bot.send_message(-1001320247347, splited_error, parse_mode='HTML')
 
 
 def executive(new, logs):
@@ -147,7 +148,6 @@ def executive(new, logs):
     error = 'Вылет ' + name + '\n'
     for i in error_raw:
         error += str(i)
-    print('ERRORRRRRRRRRRRRRRRRRRR\n' + error)
     if logs == 0:
         if len(error) > 4000:
             separator = 4000
@@ -158,13 +158,13 @@ def executive(new, logs):
             for i in range(0, splited_sep):
                 splited_error = error[i * separator:(i + 1) * separator]
                 if len(splited_error) > 0:
-                    bot.send_message(idMe, splited_error, parse_mode='HTML')
+                    bot.send_message(-1001320247347, splited_error, parse_mode='HTML')
         sleep(100)
         thread_id = _thread.start_new_thread(new, ())
         thread_array[thread_id] = defaultdict(dict)
         thread_array[thread_id]['name'] = name
         thread_array[thread_id]['function'] = new
-        bot.send_message(idMe, 'Запущен ' + bold(name), parse_mode='HTML')
+        bot.send_message(-1001320247347, 'Запущен ' + bold(name), parse_mode='HTML')
         sleep(30)
         _thread.exit()
     else:
@@ -954,14 +954,23 @@ def former(growing, kind, pub_link):
             text += '\n🔎 <a href="' + pub_link + '">Источник</a>\n'
         else:
             text = pub_link
-    else:
-        keys = keyboard
+    elif kind == 'zhopa':
+        keys = None
         text += code('-------------------\n')
         if growing['geo'].lower() != 'none':
             text += '📍http://maps.yandex.ru/?text=' + growing['geo'] + '\n'
             text += '📍https://www.google.ru/maps/place/' + growing['geo'] + '\n'
         text += '🔎' + pub_link + '🔎\n'
         text += code('-------------------\n')
+    else:
+        keys = None
+        if growing['price'] != 'none' and growing['address'] != 'none' and \
+                growing['geo'] != 'none' and growing['phone'] != 'none':
+            text += '\n📍 <a href="http://maps.yandex.ru/?text=' + growing['geo'] + '">Карта Yandex</a>\n'
+            text += '📍 <a href="https://www.google.ru/maps/place/' + growing['geo'] + '">Карта Google</a>\n'
+            text += '\n🔎 <a href="' + pub_link + '">Источник</a>\n'
+        else:
+            text = pub_link
     return [text, keys]
 
 
@@ -994,13 +1003,13 @@ def poster(id_forward, array, pub_link):
         if array[0] != pub_link:
             bot.send_message(id_forward, array[0], reply_markup=array[1], parse_mode='HTML', disable_web_page_preview=False)
         else:
-            bot.send_message(idMe, 'Что-то пошло не так:\n' + pub_link, parse_mode='HTML',
+            bot.send_message(-1001320247347, 'Что-то пошло не так:\n' + pub_link, parse_mode='HTML',
                              disable_web_page_preview=False)
     else:
         if id_forward != idMain:
             send = id_forward
         else:
-            send = idMe
+            send = -1001320247347
         bot.send_message(send, 'Что-то пошло не так:\n' + pub_link, parse_mode='HTML', disable_web_page_preview=False)
 
 
@@ -1083,7 +1092,6 @@ def inserter4(posts, quest):
                 used4.insert_row([i], 1)
             used_array.insert(0, i)
             post = quest(i)
-            print(post)
             poster(idBack, former(post[1], 'Back', post[0]), post[0])
             printer(i + ' сделано')
             sleep(5)
@@ -1092,6 +1100,7 @@ def inserter4(posts, quest):
 def move_checker():
     while True:
         try:
+            sleep(1)
             text = requests.get('https://move.ru/arenda_kvartir/ot_sobstvennika/?limit=40', headers=headers)
             soup = BeautifulSoup(text.text, 'html.parser')
             posts_raw = soup.find_all('div', class_='search-item move-object')
@@ -1108,6 +1117,7 @@ def move_checker():
 def sob_checker():
     while True:
         try:
+            sleep(1)
             text = requests.get('https://sob.ru/arenda-kvartir-moskva-bez-posrednikov?rent_type[]=2', headers=headers)
             soup = BeautifulSoup(text.text, 'html.parser')
             posts_raw = soup.find_all('div', class_='adv-card-title')
@@ -1125,6 +1135,7 @@ def sob_checker():
 def kvartirant_checker():
     while True:
         try:
+            sleep(1)
             text = requests.get('https://www.kvartirant.ru/bez_posrednikov/Moskva/sniat-kvartiru/'
                                 '?komnat[]=1&komnat[]=2&komnat[]=3&komnat[]=4', headers=headers)
             soup = BeautifulSoup(text.text, 'html.parser')
@@ -1142,6 +1153,7 @@ def kvartirant_checker():
 def domofond_checker():
     while True:
         try:
+            sleep(1)
             text = requests.get('https://www.domofond.ru/arenda-kvartiry-moskva-c3584'
                                 '?RentalRate=Month&PrivateListingType=PrivateOwner&SortOrder=Newest', headers=headers)
             soup = BeautifulSoup(text.text, 'html.parser')
@@ -1161,6 +1173,7 @@ def domofond_checker():
 def cian_checker():
     while True:
         try:
+            sleep(1)
             text = requests.get('https://www.cian.ru/snyat-kvartiru-bez-posrednikov/', headers=headers)
             soup = BeautifulSoup(text.text, 'html.parser')
             posts_raw = soup.find_all('a', class_=True)
@@ -1179,6 +1192,7 @@ def cian_checker():
 def irr_checker():
     while True:
         try:
+            sleep(1)
             text = requests.get('https://irr.ru/real-estate/rent/sort/date_sort:desc/', headers=headers)
             soup = BeautifulSoup(text.text, 'html.parser')
             posts_raw = soup.find_all('div', class_='listing__item')
