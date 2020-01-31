@@ -1,7 +1,7 @@
 import os
 from selenium import webdriver
 idMe = 396978030
-token = '771284386:AAGlJw0Faz-CLZaUtooOEV0WoT-6l2apmO'
+token = '771284386:AAGlJw0Faz-CLZaUtooOEV0WoT-6l2apmOk'
 tesseract_path = r'/app/.apt/usr/bin/tesseract'
 chrome_path = "D:\All browse downloads\chromedriver.exe"
 idMain = -1001402644636
