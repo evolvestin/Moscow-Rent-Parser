@@ -69,7 +69,7 @@ idMe = 396978030
 idAndre = 470292601
 keyboard.add(*buttons)
 idMain = docs.idMain
-idBack = docs.idBack
+idBack = idMain
 # =================================================================
 
 
