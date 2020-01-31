@@ -982,9 +982,9 @@ def searcher(link):
         elif site_search.group(1) == 'avito.ru':
             post = avito_quest(link)
         else:
-            post = False
+            post = None
     else:
-        post = False
+        post = None
     return post
 
 
@@ -1190,8 +1190,10 @@ def irr_checker():
 def avito_checker():
     while True:
         try:
-            text = requests.get('https://www.avito.ru/moskva/kvartiry/sdam/na_dlitelnyy_srok?user=1', headers=headers)
-            soup = BeautifulSoup(text.text, 'html.parser')
+            sleep(5)
+            driver = docs.web()
+            driver.get('https://www.avito.ru/moskva/kvartiry/sdam/na_dlitelnyy_srok?user=1')
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
             posts_raw = soup.find_all('div', class_='item__line')
             posts = []
             for i in posts_raw:
