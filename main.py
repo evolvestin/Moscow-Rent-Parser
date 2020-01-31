@@ -1221,7 +1221,7 @@ def telepol():
 if __name__ == '__main__':
     gain = []
     if docs.floater == 1:
-        gain = [avito_checker]
+        gain = [domofond_checker, irr_checker, cian_checker, kvartirant_checker, sob_checker, move_checker]
     elif docs.idMain == idMe:
         gain = [avito_checker]  # domofond_checker, irr_checker, cian_checker, kvartirant_checker, sob_checker, move_checker]
     thread_array = defaultdict(dict)
