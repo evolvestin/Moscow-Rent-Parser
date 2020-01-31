@@ -120,7 +120,7 @@ def send_json(raw, name, error):
     doc = open(name + '.json', 'rb')
     if len(error) <= 1000:
         caption = error
-    bot.send_document(idMe, doc, caption=caption, parse_mode='HTML')
+    bot.send_document(idMe, doc, caption=caption)
     if len(error) > 1000 and len(error) <= 4000:
         bot.send_message(idMe, error, parse_mode='HTML')
     if len(error) > 4000:
@@ -779,11 +779,13 @@ def avito_quest(pub_link):
     for i in starting:
         growing[i] = 'none'
     try:
+        print('блять')
         driver = docs.web()
         driver.get(pub_link)
         driver.find_element_by_partial_link_text('Показать').click()
         sleep(2)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
+        print(soup)
         phone_a = soup.find('a', class_='item-phone-button')
         if phone_a is not None:
             phone_img = phone_a.find('img')
