@@ -991,7 +991,11 @@ def searcher(link):
 
 def poster(id_forward, array, pub_link):
     if array[0] is not None:
-        bot.send_message(id_forward, array[0], reply_markup=array[1], parse_mode='HTML', disable_web_page_preview=False)
+        if array[0] != pub_link:
+            bot.send_message(id_forward, array[0], reply_markup=array[1], parse_mode='HTML', disable_web_page_preview=False)
+        else:
+            bot.send_message(idMe, 'Что-то пошло не так:\n' + pub_link, parse_mode='HTML',
+                             disable_web_page_preview=False)
     else:
         if id_forward != idMain:
             send = id_forward
