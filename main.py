@@ -1196,6 +1196,7 @@ def avito_checker():
             print('https://www.avito.ru/moskva/kvartiry/sdam/na_dlitelnyy_srok?user=1')
             driver.get('https://www.avito.ru/moskva/kvartiry/sdam/na_dlitelnyy_srok?user=1')
             soup = BeautifulSoup(driver.page_source, 'html.parser')
+            driver.close()
             print(soup)
             posts_raw = soup.find_all('div', class_='item__line')
             posts = []
