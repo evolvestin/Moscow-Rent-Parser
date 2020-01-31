@@ -2,6 +2,9 @@ import os
 from selenium import webdriver
 tesseract_path = r'/app/.apt/usr/bin/tesseract'
 chrome_path = "D:\All browse downloads\chromedriver.exe"
+idMain = -1001402644636
+idBack = -1001220481011
+floater = 1
 
 
 def web():
