@@ -148,7 +148,16 @@ def executive(new, logs):
     for i in error_raw:
         error += str(i)
     if logs == 0:
-        bot.send_message(idMe, error)
+        if len(error) > 4000:
+            separator = 4000
+            splited_sep = len(error) // separator
+            splited_mod = len(error) / separator - len(error) // separator
+            if splited_mod != 0:
+                splited_sep += 1
+            for i in range(0, splited_sep):
+                splited_error = error[i * separator:(i + 1) * separator]
+                if len(splited_error) > 0:
+                    bot.send_message(idMe, splited_error, parse_mode='HTML')
         sleep(100)
         thread_id = _thread.start_new_thread(new, ())
         thread_array[thread_id] = defaultdict(dict)
@@ -1190,7 +1199,7 @@ def avito_checker():
             for i in posts_raw:
                 link = i.find('a', class_='snippet-link')
                 if link is not None:
-                    posts.append('https:' + link.get('href'))
+                    posts.append('https://www.avito.ru' + link.get('href'))
             inserter4(posts, avito_quest)
         except IndexError and Exception:
             executive(avito_checker, 0)
@@ -1208,9 +1217,9 @@ def telepol():
 if __name__ == '__main__':
     gain = []
     if docs.floater == 1:
-        gain = [avito_checker]
+        gain = [avito_checker, domofond_checker]
     elif docs.idMain == idMe:
-        gain = []  # irr_checker, cian_checker, kvartirant_checker, sob_checker, move_checker]
+        gain = [avito_checker]  # irr_checker, cian_checker, kvartirant_checker, sob_checker, move_checker]
     thread_array = defaultdict(dict)
     for i in gain:
         thread_id = _thread.start_new_thread(i, ())
