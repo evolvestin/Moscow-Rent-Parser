@@ -62,10 +62,11 @@ keyboard.add(*buttons)
 idMain = -1001402644636
 idBack = -1001220481011
 # ====================================================================================
-Auth = objects.AuthCentre(os.environ['TOKEN'], -1001320247347)
+ExceptAuth = objects.AuthCentre(os.environ['TOKEN'], -1001320247347)
+Auth = objects.AuthCentre(os.environ['TOKEN'])
 bot = Auth.start_main_bot('non-async')
 create_image = open('image.png', 'w')
-executive = Auth.thread_exec
+executive = ExceptAuth.thread_exec
 Auth.start_message(stamp1)
 create_image.close()
 # ====================================================================================
@@ -765,9 +766,9 @@ def callbacks(call):
                     bot.edit_message_text(chat_id=call.message.chat.id, text=text, message_id=call.message.message_id,
                                           reply_markup=None, parse_mode='HTML', disable_web_page_preview=False)
                 else:
-                    Auth.send_json(str(call.message), 'callbacks', code('Ссылка какая-то не та'))
+                    ExceptAuth.send_json(str(call.message), 'callbacks', code('Ссылка какая-то не та'))
             else:
-                Auth.send_json(str(call.message), 'callbacks', code('Не нашел в посте ссылку на вакансию'))
+                ExceptAuth.send_json(str(call.message), 'callbacks', code('Не нашел в посте ссылку на вакансию'))
 
         elif call.data == 'viewed':
             text = call.message.text + code('\n👀 просмотрен 👀')
