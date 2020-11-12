@@ -60,7 +60,6 @@ idMe = 396978030
 idAndre = 470292601
 keyboard.add(*buttons)
 idMain = -1001402644636
-idBack = -1001220481011
 # ====================================================================================
 ExceptAuth = objects.AuthCentre(os.environ['TOKEN'], -1001320247347)
 Auth = objects.AuthCentre(os.environ['TOKEN'])
@@ -809,7 +808,7 @@ def inserter3(posts, quest):
                 used3.insert_row([i], 1)
             used_array.insert(0, i)
             post = quest(i)
-            poster(idBack, former(post[1], 'Back', post[0]), post[0])
+            poster(idMain, former(post[1], 'Back', post[0]), post[0])
             objects.printer(i + ' сделано')
             sleep(4)
 
@@ -828,7 +827,7 @@ def inserter4(posts, quest):
                 used4.insert_row([i], 1)
             used_array.insert(0, i)
             post = quest(i)
-            poster(idBack, former(post[1], 'Back', post[0]), post[0])
+            poster(idMain, former(post[1], 'Back', post[0]), post[0])
             objects.printer(i + ' сделано')
             sleep(5)
 
