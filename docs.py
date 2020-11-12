@@ -1,10 +1,6 @@
 import os
 from selenium import webdriver
-idMe = 396978030
 tesseract_path = r'/app/.apt/usr/bin/tesseract'
-idMain = -1001402644636
-idBack = -1001220481011
-floater = 1
 
 
 def web():

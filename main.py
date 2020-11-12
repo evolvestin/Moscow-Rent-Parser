@@ -1,23 +1,17 @@
 import os
 import re
-import sys
 import docs
-import time
 import base64
 import objects
 import _thread
 import gspread
-import calendar
 import requests
-import traceback
-import unicodedata
 import pytesseract
 from time import sleep
 from telebot import types
 from bs4 import BeautifulSoup
 from datetime import datetime
-from unidecode import unidecode
-from collections import defaultdict
+from objects import bold, code, italic, stamper
 
 stamp1 = objects.time_now()
 objects.environmental_files()
@@ -65,145 +59,15 @@ calendar_list_short = {
 idMe = 396978030
 idAndre = 470292601
 keyboard.add(*buttons)
-idMain = docs.idMain
-idBack = idMain
-# =================================================================
-
-
-def bold(txt):
-    return '<b>' + txt + '</b>'
-
-
-def code(txt):
-    return '<code>' + txt + '</code>'
-
-
-def italic(txt):
-    return '<i>' + txt + '</i>'
-
-
-def stamper(date, pattern):
-    try:
-        stamp = int(calendar.timegm(time.strptime(date, pattern)))
-    except:
-        stamp = False
-    return stamp
-
-
-def printer(printer_text):
-    thread_name = str(thread_array[_thread.get_ident()]['name'])
-    logfile = open('log.txt', 'a')
-    log_print_text = thread_name + ' [' + str(_thread.get_ident()) + '] ' + printer_text
-    logfile.write('\n' + re.sub('<.*?>', '', logtime(0)) + log_print_text)
-    logfile.close()
-    print(log_print_text)
-
-
-def send_json(raw, name, error):
-    json_text = ''
-    for character in raw:
-        replaced = unidecode(str(character))
-        if replaced != '':
-            json_text += replaced
-        else:
-            try:
-                json_text += '[' + unicodedata.name(character) + ']'
-            except ValueError:
-                json_text += '[???]'
-    if len(error) <= 1000:
-        if json_text != '':
-            docw = open(name + '.json', 'w')
-            docw.write(json_text)
-            docw.close()
-            doc = open(name + '.json', 'rb')
-            bot.send_document(-1001320247347, doc, caption=error)
-            doc.close()
-        else:
-            bot.send_message(-1001320247347, error, parse_mode='HTML')
-    if len(error) > 1000 and len(error) <= 4000:
-        bot.send_message(-1001320247347, error)
-    if len(error) > 4000:
-        separator = 4000
-        splited_sep = len(error) // separator
-        splited_mod = len(error) / separator - len(error) // separator
-        if splited_mod != 0:
-            splited_sep += 1
-        for i in range(0, splited_sep):
-            splited_error = error[i * separator:(i + 1) * separator]
-            if len(splited_error) > 0:
-                bot.send_message(-1001320247347, splited_error, parse_mode='HTML')
-
-
-def executive(new, logs):
-    search = re.search('<function (\S+)', str(new))
-    if search:
-        name = search.group(1)
-    else:
-        name = 'None'
-    exc_type, exc_value, exc_traceback = sys.exc_info()
-    error_raw = traceback.format_exception(exc_type, exc_value, exc_traceback)
-    error = 'Вылет ' + name + '\n'
-    for i in error_raw:
-        error += str(i)
-    if logs == 0:
-        if len(error) > 4000:
-            separator = 4000
-            splited_sep = len(error) // separator
-            splited_mod = len(error) / separator - len(error) // separator
-            if splited_mod != 0:
-                splited_sep += 1
-            for i in range(0, splited_sep):
-                splited_error = error[i * separator:(i + 1) * separator]
-                if len(splited_error) > 0:
-                    bot.send_message(-1001320247347, splited_error, parse_mode='HTML')
-        sleep(100)
-        thread_id = _thread.start_new_thread(new, ())
-        thread_array[thread_id] = defaultdict(dict)
-        thread_array[thread_id]['name'] = name
-        thread_array[thread_id]['function'] = new
-        bot.send_message(-1001320247347, 'Запущен ' + bold(name), parse_mode='HTML')
-        sleep(30)
-        _thread.exit()
-    else:
-        send_json(logs, name, error)
-
-
-def logtime(stamp):
-    if stamp == 0:
-        stamp = int(datetime.now().timestamp())
-    weekday = datetime.utcfromtimestamp(int(stamp + 3 * 60 * 60)).strftime('%a')
-    if weekday == 'Mon':
-        weekday = 'Пн'
-    elif weekday == 'Tue':
-        weekday = 'Вт'
-    elif weekday == 'Wed':
-        weekday = 'Ср'
-    elif weekday == 'Thu':
-        weekday = 'Чт'
-    elif weekday == 'Fri':
-        weekday = 'Пт'
-    elif weekday == 'Sat':
-        weekday = 'Сб'
-    elif weekday == 'Sun':
-        weekday = 'Вс'
-    day = datetime.utcfromtimestamp(int(stamp + 3 * 60 * 60)).strftime('%d')
-    month = datetime.utcfromtimestamp(int(stamp + 3 * 60 * 60)).strftime('%m')
-    year = datetime.utcfromtimestamp(int(stamp + 3 * 60 * 60)).strftime('%Y')
-    hours = datetime.utcfromtimestamp(int(stamp + 3 * 60 * 60)).strftime('%H')
-    minutes = datetime.utcfromtimestamp(int(stamp)).strftime('%M')
-    seconds = datetime.utcfromtimestamp(int(stamp)).strftime('%S')
-    data = code(str(weekday) + ' ' + str(day) + '.' + str(month) + '.' + str(year) +
-                ' ' + str(hours) + ':' + str(minutes) + ':' + str(seconds)) + ' '
-    return data
-
-
-logfile_start = open('log.txt', 'w')
+idMain = -1001402644636
+idBack = -1001220481011
+# ====================================================================================
+Auth = objects.AuthCentre(os.environ['TOKEN'], -1001320247347)
+bot = Auth.start_main_bot('non-async')
 create_image = open('image.png', 'w')
-logfile_start.write('Начало записи лога ' + re.sub('<.*?>', '', logtime(0)))
-logfile_start.close()
+executive = Auth.thread_exec
+Auth.start_message(stamp1)
 create_image.close()
-bot = objects.start_main_bot('non-async', os.environ['TOKEN'])
-objects.start_message(os.environ['TOKEN'], stamp1)
 # ====================================================================================
 
 
@@ -225,7 +89,7 @@ def move_quest(pub_link):
 
     price = soup.find('span', class_='block-price_main-price-value js-price-main-value')
     if price is not None:
-        search = re.search('(\d+)', re.sub('\s', '', price.get_text().strip()))
+        search = re.search(r'(\d+)', re.sub(r'\s', '', price.get_text().strip()))
         if search:
             growing['price'] = [int(search.group(1)), int(search.group(1)) // 65]
 
@@ -236,11 +100,11 @@ def move_quest(pub_link):
             if growing['address'] != 'none':
                 growing['address'] += ', ' + i.get_text()
             else:
-                growing['address'] = re.sub('г\. ', '', i.get_text())
+                growing['address'] = re.sub(r'г\. ', '', i.get_text())
 
-    geo_search = re.search('YaMaps\.coords=\[(.*?)\];', str(soup))
+    geo_search = re.search(r'YaMaps\.coords=\[(.*?)\];', str(soup))
     if geo_search:
-        growing['geo'] = re.sub('\s', '', geo_search.group(1))
+        growing['geo'] = re.sub(r'\s', '', geo_search.group(1))
 
     metro_raw = soup.find('ul', class_='geo-block__block-distance')
     if metro_raw is not None:
@@ -256,9 +120,9 @@ def move_quest(pub_link):
     if soup.find('div', class_='block-user'):
         name = soup.find('a', class_='block-user__name')
         if name is not None:
-            growing['name'] = re.sub('\s+', ' ', name.get_text().strip())
+            growing['name'] = re.sub(r'\s+', ' ', name.get_text().strip())
 
-    search = re.search('https://move\.ru/objects/(.*)', pub_link)
+    search = re.search(r'https://move\.ru/objects/(.*)', pub_link)
     if search:
         phone_link = 'https://move.ru/objects_print/printing/' + search.group(1)
         phone_req = requests.get(phone_link, headers=headers)
@@ -291,7 +155,7 @@ def move_quest(pub_link):
         else:
             for i in calendar_list:
                 date_text = re.sub(i, calendar_list.get(i), date_text)
-        search = re.search(' в \d{2}:\d{2}', date_text)
+        search = re.search(r' в \d{2}:\d{2}', date_text)
         pattern = '%d %m %Y'
         if search:
             pattern += ' в %H:%M'
@@ -299,7 +163,7 @@ def move_quest(pub_link):
         if date_to_stamp is not None:
             growing['date'] = date_to_stamp
 
-    search = re.search('https://(.*?)\..*?/', pub_link)
+    search = re.search(r'https://(.*?)\..*?/', pub_link)
     if search:
         growing['site'] = search.group(1).capitalize()
 
@@ -321,7 +185,7 @@ def sob_quest(pub_link):
 
     price = soup.find('p', class_='text-price')
     if price is not None:
-        search = re.search('(\d+)', re.sub('\s', '', price.get_text().strip()))
+        search = re.search(r'(\d+)', re.sub(r'\s', '', price.get_text().strip()))
         if search:
             growing['price'] = [int(search.group(1)), int(search.group(1)) // 65]
 
@@ -341,14 +205,14 @@ def sob_quest(pub_link):
     if rooms_div is not None:
         rooms = rooms_div.find('h1')
         if rooms is not None:
-            rooms_raw = re.sub('Сдается|квартира|' + roomer, '', rooms.get_text()).strip()
-            search = re.search('(\d+)-комнатная', rooms_raw)
+            rooms_raw = re.sub(r'Сдается|квартира|' + roomer, '', rooms.get_text()).strip()
+            search = re.search(r'(\d+)-комнатная', rooms_raw)
             if search:
                 growing['rooms'] = search.group(1)
 
-    geo_search = re.search('coords: \[(.*?)\],', str(soup))
+    geo_search = re.search(r'coords: \[(.*?)\],', str(soup))
     if geo_search:
-        growing['geo'] = re.sub('\s', '', geo_search.group(1))
+        growing['geo'] = re.sub(r'\s', '', geo_search.group(1))
 
     metro_raw = soup.find('p', class_='subway-link')
     if metro_raw is not None:
@@ -358,7 +222,7 @@ def sob_quest(pub_link):
         if metro_station is not None:
             metro[0] = metro_station.get_text().strip()
         if metro_walk is not None:
-            metro[1] = re.sub('\(|\)|пешком', '', metro_walk.get_text()).strip()
+            metro[1] = re.sub(r'\(|\)|пешком', '', metro_walk.get_text()).strip()
         growing['metro'] = metro
 
     phone_div = soup.find('div', class_='phone-show-visible')
@@ -383,7 +247,7 @@ def sob_quest(pub_link):
         else:
             for i in calendar_list:
                 date_text = re.sub(i, calendar_list.get(i), date_text)
-        search = re.search(' в \d{2}:\d{2}', date_text)
+        search = re.search(r' в \d{2}:\d{2}', date_text)
         pattern = '%d %m %Y'
         if search:
             pattern += ' в %H:%M'
@@ -391,7 +255,7 @@ def sob_quest(pub_link):
         if date_to_stamp is not None:
             growing['date'] = date_to_stamp
 
-    search = re.search('https://(.*?)\..*?/', pub_link)
+    search = re.search(r'https://(.*?)\..*?/', pub_link)
     if search:
         growing['site'] = search.group(1).capitalize()
 
@@ -418,11 +282,11 @@ def kvartirant_quest(pub_link):
             if rooms is not None:
                 price = rooms.find('span')
                 if price is not None:
-                    search = re.search('(\d+)', re.sub('\s', '', price.get_text().strip()))
+                    search = re.search(r'(\d+)', re.sub(r'\s', '', price.get_text().strip()))
                     if search:
                         growing['price'] = [int(search.group(1)), int(search.group(1)) // 65]
-                rooms_raw = re.sub('Сдам|квартиру|' + '', '', rooms.get_text()).strip()
-                search = re.search('(\d+)-комнат', rooms_raw)
+                rooms_raw = re.sub(r'Сдам|квартиру|' + '', '', rooms.get_text()).strip()
+                search = re.search(r'(\d+)-комнат', rooms_raw)
                 if search:
                     growing['rooms'] = search.group(1)
 
@@ -434,9 +298,9 @@ def kvartirant_quest(pub_link):
                 modify_address = re.sub('На карте:', '', address_p.get_text()).strip()
                 growing['address'] = re.sub('.*?Москва', 'Москва', modify_address).strip()
 
-    geo_search = re.search('center: \[(.*?)\]', str(soup))
+    geo_search = re.search(r'center: \[(.*?)\]', str(soup))
     if geo_search:
-        growing['geo'] = re.sub('\s', '', geo_search.group(1))
+        growing['geo'] = re.sub(r'\s', '', geo_search.group(1))
 
     metro_raw = soup.find_all('div', class_='col-xs-12 obj-info')
     for i in metro_raw:
@@ -466,11 +330,11 @@ def kvartirant_quest(pub_link):
         phone = phone_raw.find('span', class_='red')
         if phone is not None:
             phone_text = ''
-            search = re.findall('document\.write\(\'(.*?)\'\)', phone.get_text())
+            search = re.findall(r'document\.write\(\'(.*?)\'\)', phone.get_text())
             for i in search:
                 phone_text += i
             growing['phone'] = phone_text.strip()
-        search = re.search('(.*?)\|.*', phone_raw.get_text().strip())
+        search = re.search(r'(.*?)\|.*', phone_raw.get_text().strip())
         if search:
             growing['name'] = re.sub('if.*', '', search.group(1)).strip().capitalize()
 
@@ -492,7 +356,7 @@ def kvartirant_quest(pub_link):
         else:
             for i in calendar_list:
                 date_text = re.sub(i, calendar_list.get(i), date_text)
-        search = re.search(' \d{2}:\d{2}', date_text)
+        search = re.search(r' \d{2}:\d{2}', date_text)
         pattern = '%d %m %Y'
         if search:
             pattern += ' %H:%M'
@@ -500,7 +364,7 @@ def kvartirant_quest(pub_link):
         if date_to_stamp is not None:
             growing['date'] = date_to_stamp
 
-    search = re.search('https://(.*?)\..*?/', re.sub('www\.', '', pub_link))
+    search = re.search(r'https://(.*?)\..*?/', re.sub(r'www\.', '', pub_link))
     if search:
         growing['site'] = search.group(1).capitalize()
 
@@ -528,7 +392,7 @@ def domofond_quest(pub_link):
             if i.get_text().startswith('Комнаты:'):
                 growing['rooms'] = re.sub('Комнаты:', '', i.get_text()).strip()
             if i.get_text().startswith('Цена:'):
-                search = re.search('(\d+)', re.sub('\s', '', i.get_text().strip()))
+                search = re.search(r'(\d+)', re.sub(r'\s', '', i.get_text().strip()))
                 if search:
                     growing['price'] = [int(search.group(1)), int(search.group(1)) // 65]
             if i.get_text().startswith('Дата публикации объявления:'):
@@ -548,14 +412,14 @@ def domofond_quest(pub_link):
 
     geo_search = re.search('"location":{"longitude":(.*?),"latitude":(.*?)}', str(soup))
     if geo_search:
-        growing['geo'] = re.sub('\s', '', geo_search.group(2)) + ',' + re.sub('\s', '', geo_search.group(1))
+        growing['geo'] = re.sub(r'\s', '', geo_search.group(2)) + ',' + re.sub(r'\s', '', geo_search.group(1))
 
     metro_raw = soup.find('div', class_=re.compile('^information__metro'))
     if metro_raw is not None:
         metro = ['none', 'none']
         metro[0] = metro_raw.get_text()[1:]
-        search_km = re.search('.*\s(\d+\.\d+\sкм)', metro[0])
-        search_m = re.search('.*\s(\d+\sм)', metro[0])
+        search_km = re.search(r'.*\s(\d+\.\d+\sкм)', metro[0])
+        search_m = re.search(r'.*\s(\d+\sм)', metro[0])
         if search_km:
             metro[0] = re.sub(search_km.group(1), '', metro[0]).strip()
             metro[1] = search_km.group(1).strip()
@@ -580,8 +444,8 @@ def domofond_quest(pub_link):
         phone_a = phone_soup.find('a', class_=re.compile('^show-number-button__link'))
         if phone_a is not None:
             phone_raw = phone_a.get_text().strip()
-            if re.sub('\D', '', phone_raw).startswith('7') and len(re.sub('\D', '', phone_raw)) == 11:
-                phone_raw = re.sub('\D', '', phone_raw)
+            if re.sub(r'\D', '', phone_raw).startswith('7') and len(re.sub(r'\D', '', phone_raw)) == 11:
+                phone_raw = re.sub(r'\D', '', phone_raw)
                 growing['phone'] = '+' + phone_raw[0] + ' (' + phone_raw[1] + phone_raw[2] + phone_raw[3] + ') ' + \
                                    phone_raw[4] + phone_raw[5] + phone_raw[6] + '-' + \
                                    phone_raw[7] + phone_raw[8] + '-' + phone_raw[9] + phone_raw[10]
@@ -589,9 +453,9 @@ def domofond_quest(pub_link):
                 growing['phone'] = phone_raw
         driver.close()
     except IndexError and Exception:
-        printer('Вылет domofond извлечения номера')
+        objects.printer('Вылет domofond извлечения номера')
 
-    search = re.search('https://(.*?)\..*?/', re.sub('www\.', '', pub_link))
+    search = re.search(r'https://(.*?)\..*?/', re.sub(r'www\.', '', pub_link))
     if search:
         growing['site'] = search.group(1).capitalize()
 
@@ -611,7 +475,7 @@ def cian_quest(pub_link):
 
     rooms_div = soup.find('h1', attrs={'data-name': 'OfferTitle'})
     if rooms_div is not None:
-        search = re.search('(\d+)-комн.', rooms_div.get_text())
+        search = re.search(r'(\d+)-комн.', rooms_div.get_text())
         search_studio = re.search('Студия', rooms_div.get_text())
         if search:
             growing['rooms'] = search.group(1)
@@ -620,7 +484,7 @@ def cian_quest(pub_link):
 
     price_span = soup.find('span', attrs={'itemprop': 'price'})
     if price_span is not None:
-        search = re.search('(\d+)', re.sub('\s', '', price_span.get_text().strip()))
+        search = re.search(r'(\d+)', re.sub(r'\s', '', price_span.get_text().strip()))
         if search:
             growing['price'] = [int(search.group(1)), int(search.group(1)) // 65]
 
@@ -630,7 +494,7 @@ def cian_quest(pub_link):
 
     geo_search = re.search('coordinates":{"lat":(.*?),"lng":(.*?)}', str(soup))
     if geo_search:
-        growing['geo'] = re.sub('\s', '', geo_search.group(1)) + ',' + re.sub('\s', '', geo_search.group(2))
+        growing['geo'] = re.sub(r'\s', '', geo_search.group(1)) + ',' + re.sub(r'\s', '', geo_search.group(2))
 
     metro_raw = soup.find('li', attrs={'data-name': 'renderUnderground'})
     if metro_raw is not None:
@@ -646,7 +510,7 @@ def cian_quest(pub_link):
     phone = soup.find('a', class_=re.compile('.*?-phone-.*'))
     if phone is not None:
         phone_raw = phone.get_text().strip()
-        search = re.search('\s(\d{3})\s', phone_raw)
+        search = re.search(r'\s(\d{3})\s', phone_raw)
         if search:
             phone_raw = re.sub(' ' + search.group(1) + ' ', ' (' + search.group(1) + ') ', phone_raw)
         growing['phone'] = phone_raw
@@ -669,7 +533,7 @@ def cian_quest(pub_link):
         else:
             for i in calendar_list_short:
                 date_text = re.sub(i, calendar_list_short.get(i), date_text)
-        search = re.search(' \d{2}:\d{2}', date_text)
+        search = re.search(r' \d{2}:\d{2}', date_text)
         pattern = '%d %m %Y'
         if search:
             pattern += ' %H:%M'
@@ -677,7 +541,7 @@ def cian_quest(pub_link):
         if date_to_stamp is not None:
             growing['date'] = date_to_stamp
 
-    search = re.search('https://(.*?)\..*?/', re.sub('www\.', '', pub_link))
+    search = re.search(r'https://(.*?)\..*?/', re.sub(r'www\.', '', pub_link))
     if search:
         growing['site'] = search.group(1).capitalize()
 
@@ -702,24 +566,24 @@ def irr_quest(pub_link):
 
     price_div = soup.find('div', class_='productPage__price')
     if price_div is not None:
-        search = re.search('(\d+)', re.sub('\s', '', price_div.get_text().strip()))
+        search = re.search(r'(\d+)', re.sub(r'\s', '', price_div.get_text().strip()))
         if search:
             growing['price'] = [int(search.group(1)), int(search.group(1)) // 65]
 
     address_div = soup.find('div', class_='js-scrollToMap')
     if address_div is not None:
-        growing['address'] = re.sub('\s+', ' ', address_div.get_text()).strip()
+        growing['address'] = re.sub(r'\s+', ' ', address_div.get_text()).strip()
 
     geo_div = soup.find('div', class_='js-productPageMap')
     if geo_div is not None:
         if geo_div.get('data-map-info') is not None:
             geo_search = re.search('{"lat":"(.*?)","lng":"(.*?)",', geo_div.get('data-map-info'))
             if geo_search:
-                growing['geo'] = re.sub('\s', '', geo_search.group(1)) + ',' + re.sub('\s', '', geo_search.group(2))
+                growing['geo'] = re.sub(r'\s', '', geo_search.group(1)) + ',' + re.sub(r'\s', '', geo_search.group(2))
 
     geo_search = re.search('coordinates":{"lat":(.*?),"lng":(.*?)}', str(soup))
     if geo_search:
-        growing['geo'] = re.sub('\s', '', geo_search.group(1)) + ',' + re.sub('\s', '', geo_search.group(2))
+        growing['geo'] = re.sub(r'\s', '', geo_search.group(1)) + ',' + re.sub(r'\s', '', geo_search.group(2))
 
     phone_input = soup.find('input', attrs={'name': 'phoneBase64'})
     if phone_input is not None:
@@ -727,8 +591,8 @@ def irr_quest(pub_link):
             try:
                 phone = base64.standard_b64decode(phone_input.get('value'))
                 growing['phone'] = phone.decode('utf-8')
-            except:
-                printer('Вылет irr.ru извлечения номера')
+            except IndexError and Exception:
+                objects.printer('Вылет irr.ru извлечения номера')
 
     date_raw = soup.find('div', class_='productPage__createDate')
     if date_raw is not None:
@@ -748,12 +612,12 @@ def irr_quest(pub_link):
         else:
             for i in calendar_list:
                 modifier = calendar_list.get(i)
-                search = re.search('\d{4}', date_text)
+                search = re.search(r'\d{4}', date_text)
                 if search is None:
                     year = datetime.utcfromtimestamp(stamp).strftime('%Y')
                     modifier += ' ' + year
                 date_text = re.sub(i, modifier, date_text)
-        search = re.search(' \d{2}:\d{2}', date_text)
+        search = re.search(r' \d{2}:\d{2}', date_text)
         pattern = '%d %m %Y'
         if search:
             pattern += ' %H:%M'
@@ -761,7 +625,7 @@ def irr_quest(pub_link):
         if date_to_stamp is not None:
             growing['date'] = date_to_stamp
 
-    search = re.search('https://(.*?)\..*?/', re.sub('www\.', '', pub_link))
+    search = re.search(r'https://(.*?)\..*?/', re.sub(r'www\.', '', pub_link))
     if search:
         growing['site'] = search.group(1).capitalize()
 
@@ -818,7 +682,8 @@ def former(growing, kind, pub_link):
     if growing['photo'] != 'none':
         text += '\n<a href="' + growing['photo'] + '">📷 Фото</a>\n'
     else:
-        text += '\n📷 <a href="http://i.piccy.info/i9/d54e0fe23cde2f29e1bdac9383549194/1580247525/56511/1359385/BD97F41E_45D9_4992_9485_385F3B18898C.jpg">Фото отсутсвуют</a>\n'
+        text += '\n📷 <a href="http://i.piccy.info/i9/d54e0fe23cde2f29e1bdac9383549194/1580247525/56511/1359385/' \
+            'BD97F41E_45D9_4992_9485_385F3B18898C.jpg">Фото отсутсвуют</a>\n'
 
     if kind == 'MainChannel':
         keys = None
@@ -874,7 +739,8 @@ def searcher(link):
 def poster(id_forward, array, pub_link):
     if array[0] is not None:
         if array[0] != pub_link:
-            bot.send_message(id_forward, array[0], reply_markup=array[1], parse_mode='HTML', disable_web_page_preview=False)
+            bot.send_message(id_forward, array[0], reply_markup=array[1],
+                             parse_mode='HTML', disable_web_page_preview=False)
         else:
             bot.send_message(-1001320247347, 'Что-то пошло не так:\n' + pub_link, parse_mode='HTML',
                              disable_web_page_preview=False)
@@ -899,16 +765,16 @@ def callbacks(call):
                     bot.edit_message_text(chat_id=call.message.chat.id, text=text, message_id=call.message.message_id,
                                           reply_markup=None, parse_mode='HTML', disable_web_page_preview=False)
                 else:
-                    send_json(call.message.text, 'callbacks', code('Ссылка какая-то не та'))
+                    Auth.send_json(str(call.message), 'callbacks', code('Ссылка какая-то не та'))
             else:
-                send_json(call.message.text, 'callbacks', code('Не нашел в посте ссылку на вакансию'))
+                Auth.send_json(str(call.message), 'callbacks', code('Не нашел в посте ссылку на вакансию'))
 
         elif call.data == 'viewed':
             text = call.message.text + code('\n👀 просмотрен 👀')
             bot.edit_message_text(chat_id=call.message.chat.id, text=text, message_id=call.message.message_id,
                                   reply_markup=None, parse_mode='HTML', disable_web_page_preview=False)
     except IndexError and Exception:
-        executive(callbacks, str(call))
+        executive(str(call))
 
 
 @bot.message_handler(func=lambda message: message.text)
@@ -923,48 +789,46 @@ def repeat_all_messages(message):
                 bot.send_document(message.chat.id, doc)
                 doc.close()
             else:
-                bot.send_message(message.chat.id, bold('ссылка не подошла, пошел нахуй'), parse_mode='HTML')
+                bot.send_message(message.chat.id, bold('ссылка не подошла'), parse_mode='HTML')
     except IndexError and Exception:
-        executive(repeat_all_messages, str(message))
+        executive(str(message))
 
 
 def inserter3(posts, quest):
     global used3
-    global creds3
     global client3
     global used_array
     for i in posts:
         if i not in used_array:
             try:
                 used3.insert_row([i], 1)
-            except:
+            except IndexError and Exception:
                 client3 = gspread.service_account('person3.json')
                 used3 = client3.open('Moscow-Rent').worksheet('main')
                 used3.insert_row([i], 1)
             used_array.insert(0, i)
             post = quest(i)
             poster(idBack, former(post[1], 'Back', post[0]), post[0])
-            printer(i + ' сделано')
+            objects.printer(i + ' сделано')
             sleep(4)
 
 
 def inserter4(posts, quest):
     global used4
-    global creds4
     global client4
     global used_array
     for i in posts:
         if i not in used_array:
             try:
                 used4.insert_row([i], 1)
-            except:
+            except IndexError and Exception:
                 client4 = gspread.service_account('person4.json')
                 used4 = client4.open('Moscow-Rent').worksheet('main')
                 used4.insert_row([i], 1)
             used_array.insert(0, i)
             post = quest(i)
             poster(idBack, former(post[1], 'Back', post[0]), post[0])
-            printer(i + ' сделано')
+            objects.printer(i + ' сделано')
             sleep(5)
 
 
@@ -982,7 +846,7 @@ def move_checker():
                     posts.append('https:' + link.get('href'))
             inserter3(posts, move_quest)
         except IndexError and Exception:
-            executive(move_checker, 0)
+            executive()
 
 
 def sob_checker():
@@ -1000,7 +864,7 @@ def sob_checker():
                         posts.append('https:' + link.get('href'))
             inserter3(posts, sob_quest)
         except IndexError and Exception:
-            executive(sob_checker, 0)
+            executive()
 
 
 def kvartirant_checker():
@@ -1018,7 +882,7 @@ def kvartirant_checker():
                     posts.append('https://www.kvartirant.ru' + link.get('href'))
             inserter3(posts, kvartirant_quest)
         except IndexError and Exception:
-            executive(kvartirant_checker, 0)
+            executive()
 
 
 def domofond_checker():
@@ -1038,7 +902,7 @@ def domofond_checker():
                         posts.append('https://www.domofond.ru' + i.get('href'))
             inserter4(posts, domofond_quest)
         except IndexError and Exception:
-            executive(domofond_checker, 0)
+            executive()
 
 
 def cian_checker():
@@ -1057,7 +921,7 @@ def cian_checker():
                         posts.append(i.get('href'))
             inserter4(posts, cian_quest)
         except IndexError and Exception:
-            executive(cian_checker, 0)
+            executive()
 
 
 def irr_checker():
@@ -1074,25 +938,20 @@ def irr_checker():
                     posts.append(link.get('href'))
             inserter4(posts, irr_quest)
         except IndexError and Exception:
-            executive(irr_checker, 0)
+            executive()
 
 
-def telepol():
+def telegram_polling():
     try:
         bot.polling(none_stop=True, timeout=60)
-    except:
+    except IndexError and Exception:
         bot.stop_polling()
         sleep(1)
-        telepol()
+        telegram_polling()
 
 
 if __name__ == '__main__':
     gain = [domofond_checker, irr_checker, cian_checker, kvartirant_checker, sob_checker, move_checker]
-    thread_array = defaultdict(dict)
-    for i in gain:
-        thread_id = _thread.start_new_thread(i, ())
-        thread_start_name = re.findall('<.+?\s(.+?)\s.*>', str(i))
-        thread_array[thread_id] = defaultdict(dict)
-        thread_array[thread_id]['name'] = thread_start_name[0]
-        thread_array[thread_id]['function'] = i
-    telepol()
+    for thread_element in gain:
+        thread_id = _thread.start_new_thread(thread_element, ())
+    telegram_polling()
