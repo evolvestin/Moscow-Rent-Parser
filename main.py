@@ -66,9 +66,9 @@ Auth = objects.AuthCentre(os.environ['TOKEN'])
 bot = Auth.start_main_bot('non-async')
 create_image = open('image.png', 'w')
 executive = ExceptAuth.thread_exec
-Auth.start_message(stamp1)
 create_image.close()
 # ====================================================================================
+objects.AuthCentre(os.environ['DEV-TOKEN']).start_message(stamp1)
 
 
 def move_quest(pub_link):
